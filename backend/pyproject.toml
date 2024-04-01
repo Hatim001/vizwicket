@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = "VizWicket - Analysis for IPL"
+authors = ["Hatim Patrawala <hatimpatrawala786@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "4.2.11"
+pandas = "^2.2.1"
+fuzzywuzzy = "^0.18.0"
+python-levenshtein = "^0.25.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
