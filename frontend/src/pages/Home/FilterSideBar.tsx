@@ -59,11 +59,11 @@ const FilterSideBar = () => {
       team2: "",
       match: 0,
     });
-    setAnalytics({ match: {} });
+    setAnalytics({ match: {}, selectedTeam: "" });
   };
 
   const handleApply = () => {
-    setAnalytics({ match: filters });
+    setAnalytics({ match: filters, selectedTeam: "team1" });
   };
 
   const { year, team1, team2, match } = filters;

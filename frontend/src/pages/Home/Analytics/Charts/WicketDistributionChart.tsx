@@ -7,7 +7,7 @@ import { useAnalytics } from "hooks/useAnalytics";
 import useResponsiveSize from "hooks/useResponsiveSize";
 
 const WicketDistributionChart = () => {
-  const { summary = {} } = useAnalytics();
+  const { match = {}, summary = {}, selectedTeam = "team1" } = useAnalytics();
   const svgRef = useRef<any>();
   const legendRef = useRef<any>();
   const svgWrapperRef = useRef<any>();
@@ -18,6 +18,10 @@ const WicketDistributionChart = () => {
 
   useEffect(() => {
     if (!isEmpty(summary) && svgRef.current && legendRef.current) {
+      const key =
+        selectedTeam === "team1"
+          ? "wicket_distribution_team1"
+          : "wicket_distribution_team2";
       d3.select(svgRef.current).selectAll("*").remove();
       d3.select(legendRef.current).selectAll("*").remove();
 
@@ -36,7 +40,7 @@ const WicketDistributionChart = () => {
         .sort(null)
         .value((d: any) => d?.total_wickets);
 
-      const data_ready = pie(summary?.wicket_distribution_team1);
+      const data_ready = pie(summary?.[key]);
 
       const arc = d3
         .arc()
@@ -50,7 +54,7 @@ const WicketDistributionChart = () => {
 
       svg
         .selectAll(".arc")
-        .data(pie(summary?.wicket_distribution_team1))
+        .data(pie(summary?.[key]))
         .enter()
         .append("path")
         .attr("d", arc as any)
@@ -131,7 +135,7 @@ const WicketDistributionChart = () => {
         .attr("y", (d, i) => i * 30 + 4)
         .text((d: any) => `${d.name} (${d.wickets})`);
     }
-  }, [summary, width, height, legendWidth, legendHeight]);
+  }, [summary, width, height, legendWidth, legendHeight, selectedTeam]);
 
   const renderHeader = (title: string) => {
     return (
@@ -168,7 +172,7 @@ const WicketDistributionChart = () => {
         marginLeft: 2,
       }}
     >
-      {renderHeader("Wicket Distribution")}
+      {renderHeader(`Wicket Distribution (${match?.[selectedTeam]})`)}
       <div
         style={{
           width: "100%",

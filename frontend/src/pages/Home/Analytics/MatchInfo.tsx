@@ -6,7 +6,7 @@ import { isEmpty } from "utils/helpers";
 import { useAnalytics } from "hooks/useAnalytics";
 
 const MatchInfo = () => {
-  const { match = {} } = useAnalytics();
+  const { match = {}, selectedTeam = "team1", setAnalytics } = useAnalytics();
   const [team1, setTeam1] = useState<any>(null);
   const [team2, setTeam2] = useState<any>(null);
 
@@ -32,16 +32,33 @@ const MatchInfo = () => {
       }}
     >
       <Stack alignItems={"center"}>
-        <img
-          src={team1?.logo}
-          alt={team1?.name}
-          style={{
+        <Box
+          sx={{
+            border: `${
+              selectedTeam === "team1" ? "10px" : "3px"
+            } solid ${team1Color}`,
+            borderRadius: "50%",
+            cursor: "pointer",
             height: "100px",
             width: "100px",
-            border: `3px solid ${team1Color}`,
-            borderRadius: "50%",
+            "&:hover": {
+              border: `10px solid ${team1Color}`,
+            },
           }}
-        />
+        >
+          <img
+            onClick={() => {
+              setAnalytics({ selectedTeam: "team1" });
+            }}
+            src={team1?.logo}
+            alt={team1?.name}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </Box>
       </Stack>
       <Stack spacing={1} sx={{ textAlign: "center" }}>
         <Typography>Match {match_number}</Typography>
@@ -49,16 +66,33 @@ const MatchInfo = () => {
         <Typography>{date}</Typography>
       </Stack>
       <Stack alignItems={"center"}>
-        <img
-          src={team2?.logo}
-          alt={team2?.name}
-          style={{
+        <Box
+          sx={{
+            border: `${
+              selectedTeam === "team2" ? "10px" : "3px"
+            } solid ${team2Color}`,
+            borderRadius: "50%",
+            cursor: "pointer",
             height: "100px",
             width: "100px",
-            border: `3px solid ${team2Color}`,
-            borderRadius: "50%",
+            "&:hover": {
+              border: `10px solid ${team2Color}`,
+            },
           }}
-        />
+        >
+          <img
+            onClick={() => {
+              setAnalytics({ selectedTeam: "team2" });
+            }}
+            src={team2?.logo}
+            alt={team2?.name}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </Box>
       </Stack>
     </Box>
   );

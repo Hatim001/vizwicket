@@ -8,7 +8,7 @@ import { useAnalytics } from "hooks/useAnalytics";
 import useResponsiveSize from "hooks/useResponsiveSize";
 
 const BoundariesChart = () => {
-  const { summary = {} } = useAnalytics();
+  const { match = {}, summary = {}, selectedTeam = "team1" } = useAnalytics();
   const svgRef = useRef<any>();
   const wrapperRef = useRef<any>();
   const { width, height } = useResponsiveSize(wrapperRef);
@@ -16,6 +16,7 @@ const BoundariesChart = () => {
   useEffect(() => {
     if (!isEmpty(summary) && svgRef.current) {
       d3.select(svgRef.current).selectAll("*").remove();
+      const key = selectedTeam === "team1" ? "boundaries_team1" : "boundaries_team2";
 
       const margin = { top: 10, right: 40, bottom: 70, left: 20 };
 
@@ -30,14 +31,14 @@ const BoundariesChart = () => {
 
       const xScale = d3
         .scaleLinear()
-        .domain([0, d3.max([...summary?.boundaries_team1], (d) => d.over)])
+        .domain([0, d3.max([...summary?.[key]], (d) => d.over)])
         .range([0, chartWidth]);
 
       const yScale = d3
         .scaleLinear()
         .domain([
           0,
-          d3.max([...summary?.boundaries_team1], (d) => d.cumulative_runs),
+          d3.max([...summary?.[key]], (d) => d.cumulative_runs),
         ])
         .range([chartHeight, 0]);
 
@@ -46,7 +47,7 @@ const BoundariesChart = () => {
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
       g.selectAll("circle")
-        .data(summary?.boundaries_team1)
+        .data(summary?.[key])
         .enter()
         .append("circle")
         .attr("cx", (d: any) => xScale(d.over))
@@ -76,7 +77,7 @@ const BoundariesChart = () => {
 
       const yAxisGroup = g
         .append("g")
-        .call(d3.axisLeft(yScale).ticks(summary?.boundaries_team1?.length / 2));
+        .call(d3.axisLeft(yScale).ticks(summary?.[key]?.length / 2));
 
       yAxisGroup.selectAll("text").style("font-weight", "bold");
 
@@ -91,7 +92,7 @@ const BoundariesChart = () => {
         .text("Runs")
         .style("font-weight", "bold");
     }
-  }, [summary, width, height]);
+  }, [summary, width, height, selectedTeam]);
 
   const renderLegend = () => {
     return (
@@ -171,7 +172,7 @@ const BoundariesChart = () => {
         marginLeft: 2,
       }}
     >
-      {renderHeader("Boundaries")}
+      {renderHeader(`Boundaries (${match?.[selectedTeam]})`)}
       <div ref={wrapperRef} style={{ width: "100%", height: "100%" }}>
         <svg ref={svgRef} width={width} height={height} />
       </div>
