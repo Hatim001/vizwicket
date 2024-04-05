@@ -9,7 +9,6 @@ const PublicLayout = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
-        variant="outlined"
         position="fixed"
         sx={{
           background: "#fff",

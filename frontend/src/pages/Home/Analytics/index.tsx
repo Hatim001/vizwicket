@@ -1,31 +1,80 @@
-import { Box, Typography } from "@mui/material";
-import { BarChartDataItem, BarChart } from "components/Charts";
+import { Box, Stack } from "@mui/material";
+import { useEffect, useState } from "react";
 
-type Props = {};
+import Charts from "./Charts";
+import { GET } from "utils/axios";
+import MatchInfo from "./MatchInfo";
+import { isEmpty } from "utils/helpers";
+import LocationInfo from "./LocationInfo";
+import { useAnalytics } from "hooks/useAnalytics";
+import BoundariesChart from "./Charts/BoundariesChart";
+import WicketDistributionChart from "./Charts/WicketDistributionChart";
 
-const data: BarChartDataItem[] = [
-  { name: "A", value: 0.08167 },
-  { name: "B", value: 0.01492 },
-  { name: "C", value: 0.07167 },
-  { name: "D", value: 0.06492 },
-  { name: "E", value: 0.05167 },
-  { name: "F", value: 0.21492 },
-];
+const Analytics = () => {
+  const { match = {}, setAnalytics } = useAnalytics();
+  const [loading, setLoading] = useState(false);
 
-const Analytics = (props: Props) => {
+  useEffect(() => {
+    !isEmpty(match?.match) && fetchSummary();
+  }, [match]);
+
+  const fetchSummary = () => {
+    setLoading(true);
+    GET(
+      `/api/match/${match?.match?.id}/summary?team1=${match?.team1}&team2=${match?.team2}`
+    )
+      .then((res) => {
+        setAnalytics({ summary: res?.data });
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  if (isEmpty(match)) {
+    return <>Match not found</>;
+  }
+
+  if (loading) {
+    return <>Loading...</>;
+  }
+
   return (
-    <Box sx={{ p: 1 }}>
-      <Typography variant="h6">Analytics</Typography>
-      <Box sx={{ width: "100%", height: "500px"}}>
-        <BarChart
-          data={data}
-          xLabel="Categories"
-          yLabel="Values"
-          title="Sample Bar Chart"
-          barPadding={0.5}
-        />
-      </Box>
-    </Box>
+    <Stack
+      direction={"row"}
+      sx={{
+        height: "calc(100vh - 100px)",
+        width: "calc(100vw - 332px)",
+        justifyContent: "space-between",
+      }}
+    >
+      <Stack
+        sx={{ width: "60%", height: "100%", justifyContent: "space-between" }}
+      >
+        <Box sx={{ height: "20%", width: "100%" }}>
+          <MatchInfo />
+        </Box>
+        <Box sx={{ width: "100%", height: "80%" }}>
+          <Charts />
+        </Box>
+      </Stack>
+      <Stack
+        sx={{ width: "40%", height: "100%", justifyContent: "space-between" }}
+      >
+        <Box sx={{ height: "29%", width: "100%" }}>
+          <LocationInfo />
+        </Box>
+        <Box sx={{ height: "29%", width: "100%" }}>
+          <WicketDistributionChart />
+        </Box>
+        <Box sx={{ height: "39%", width: "100%" }}>
+          <BoundariesChart />
+        </Box>
+      </Stack>
+    </Stack>
   );
 };
 
