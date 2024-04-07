@@ -16,7 +16,8 @@ const BoundariesChart = () => {
   useEffect(() => {
     if (!isEmpty(summary) && svgRef.current) {
       d3.select(svgRef.current).selectAll("*").remove();
-      const key = selectedTeam === "team1" ? "boundaries_team1" : "boundaries_team2";
+      const key =
+        selectedTeam === "team1" ? "boundaries_team1" : "boundaries_team2";
 
       const margin = { top: 10, right: 40, bottom: 70, left: 20 };
 
@@ -36,10 +37,7 @@ const BoundariesChart = () => {
 
       const yScale = d3
         .scaleLinear()
-        .domain([
-          0,
-          d3.max([...summary?.[key]], (d) => d.cumulative_runs),
-        ])
+        .domain([0, d3.max([...summary?.[key]], (d) => d.cumulative_runs)])
         .range([chartHeight, 0]);
 
       const g = svg
@@ -47,13 +45,18 @@ const BoundariesChart = () => {
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
       g.selectAll("circle")
-        .data(summary?.[key])
+        .data(summary[key])
         .enter()
         .append("circle")
         .attr("cx", (d: any) => xScale(d.over))
-        .attr("cy", (d: any) => yScale(d.cumulative_runs))
-        .attr("r", 5) // radius of circles
-        .attr("fill", (d: any) => (d.batsman_run === 4 ? "blue" : "red"));
+        .attr("cy", 0)
+        .attr("r", 0)
+        .attr("fill", (d: any) => (d.batsman_run === 4 ? "blue" : "red"))
+        .transition()
+        .duration(2000)
+        .delay((d, i) => i * 10)
+        .attr("r", 5)
+        .attr("cy", (d: any) => yScale(d.cumulative_runs));
 
       const xAxisGroup = g
         .append("g")
@@ -77,7 +80,7 @@ const BoundariesChart = () => {
 
       const yAxisGroup = g
         .append("g")
-        .call(d3.axisLeft(yScale).ticks(summary?.[key]?.length / 2));
+        .call(d3.axisLeft(yScale).ticks(summary?.[key]?.length / 3));
 
       yAxisGroup.selectAll("text").style("font-weight", "bold");
 

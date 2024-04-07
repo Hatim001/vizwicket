@@ -50,42 +50,40 @@ const WormChart = () => {
         .x((d: any) => xScale(d.over))
         .y((d: any) => yScale(d.cumulative_runs));
 
-      svg
-        .append("path")
-        .data([summary?.cumulative_runs_team1])
-        .attr("fill", "none")
-        .attr("stroke", team1Color)
-        .attr("stroke-width", "3px")
-        .attr("d", line);
-      svg
-        .append("path")
-        .data([summary?.cumulative_runs_team2])
-        .attr("fill", "none")
-        .attr("stroke", team2Color)
-        .attr("stroke-width", "3px")
-        .attr("d", line);
+      ["cumulative_runs_team1", "cumulative_runs_team2"].forEach((team, i) => {
+        const path: any = svg
+          .append("path")
+          .datum(summary[team])
+          .attr("fill", "none")
+          .attr("stroke", i === 0 ? team1Color : team2Color)
+          .attr("stroke-width", "3px")
+          .attr("d", line);
 
-      svg
-        .selectAll(".wicket-dot-team1")
-        .data(summary?.cumulative_runs_team1?.filter((d: any) => d.wicket > 0))
-        .enter()
-        .append("circle")
-        .attr("class", "wicket-dot-team1")
-        .attr("cx", (d: any) => xScale(d.over))
-        .attr("cy", (d: any) => yScale(d.cumulative_runs))
-        .attr("r", 4)
-        .attr("fill", "black");
+        const totalLength = path.node().getTotalLength();
+        path
+          .attr("stroke-dasharray", totalLength + " " + totalLength)
+          .attr("stroke-dashoffset", totalLength)
+          .transition()
+          .duration(2000)
+          .ease(d3.easeLinear)
+          .attr("stroke-dashoffset", 0);
+      });
 
-      svg
-        .selectAll(".wicket-dot-team2")
-        .data(summary?.cumulative_runs_team2?.filter((d: any) => d.wicket > 0))
-        .enter()
-        .append("circle")
-        .attr("class", "wicket-dot-team2")
-        .attr("cx", (d: any) => xScale(d.over))
-        .attr("cy", (d: any) => yScale(d.cumulative_runs))
-        .attr("r", 4)
-        .attr("fill", "black");
+      ['cumulative_runs_team1', 'cumulative_runs_team2'].forEach((team, i) => {
+        svg.selectAll('.wicket-dot-' + team)
+          .data(summary[team].filter((d: any) => d.wicket > 0))
+          .enter()
+          .append('circle')
+          .attr('cx', (d: any) => xScale(d.over))
+          .attr('cy', -10)
+          .attr('r', 0)
+          .attr('fill', 'black')
+          .transition()
+          .duration(1500)
+          .delay((d, i) => 200 + i * 200)
+          .attr('cy', (d: any) => yScale(d.cumulative_runs))
+          .attr('r', 5);
+      });
 
       const xAxisGroup = svg
         .append("g")

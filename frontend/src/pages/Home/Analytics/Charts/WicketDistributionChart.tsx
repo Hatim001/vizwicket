@@ -18,10 +18,7 @@ const WicketDistributionChart = () => {
 
   useEffect(() => {
     if (!isEmpty(summary) && svgRef.current && legendRef.current) {
-      const key =
-        selectedTeam === "team1"
-          ? "wicket_distribution_team1"
-          : "wicket_distribution_team2";
+      const key = selectedTeam === "team1" ? "wicket_distribution_team1" : "wicket_distribution_team2";
       d3.select(svgRef.current).selectAll("*").remove();
       d3.select(legendRef.current).selectAll("*").remove();
 
@@ -61,6 +58,9 @@ const WicketDistributionChart = () => {
         .style("fill", (d: any) => color(d.data.bowler_name))
         .attr("stroke", "white")
         .style("stroke-width", "2px")
+        .style("opacity", 0)
+        .transition()
+        .duration(1000)
         .style("opacity", 0.7);
 
       svg
@@ -77,7 +77,11 @@ const WicketDistributionChart = () => {
           const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
           posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1);
           return `${posA},${posB},${posC}`;
-        });
+        })
+        .style("opacity", 0)
+        .transition()
+        .duration(1500)
+        .style("opacity", 0.7);
 
       svg
         .selectAll(".arc")
@@ -94,7 +98,12 @@ const WicketDistributionChart = () => {
         .style("text-anchor", function (d) {
           const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
           return midangle < Math.PI ? "start" : "end";
-        });
+        })
+        .style("opacity", 0)
+        .transition()
+        .delay(1000) // Delay to sync with slice appearance
+        .duration(500)
+        .style("opacity", 1);
 
       const legendItems = data_ready.map((d: any) => ({
         name: d.data.bowler_name,
