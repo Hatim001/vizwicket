@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-    os.getenv("FRONTEND_URL"),
+    os.getenv("FRONTEND_URL", "http://localhost:3000"),
 )
 
 CORS_ALLOW_HEADERS = [
