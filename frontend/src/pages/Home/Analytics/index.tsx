@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import Charts from "./Charts";
 import { GET } from "utils/axios";
@@ -9,38 +9,35 @@ import LocationInfo from "./LocationInfo";
 import { useAnalytics } from "hooks/useAnalytics";
 import BoundariesChart from "./Charts/BoundariesChart";
 import WicketDistributionChart from "./Charts/WicketDistributionChart";
+import { Loader } from "components";
+import NotFound from "pages/NotFound";
 
 const Analytics = () => {
-  const { match = {}, setAnalytics } = useAnalytics();
-  const [loading, setLoading] = useState(false);
+  const { match = {}, showAnalyticsLoader, setAnalytics } = useAnalytics();
 
   useEffect(() => {
     !isEmpty(match?.match) && fetchSummary();
   }, [match]);
 
   const fetchSummary = () => {
-    setLoading(true);
-    GET(
-      `/api/match/${match?.match?.id}/summary?team1=${match?.team1}&team2=${match?.team2}`
-    )
-      .then((res) => {
-        setAnalytics({ summary: res?.data });
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    setAnalytics({ showAnalyticsLoader: true });
+    setTimeout(
+      () =>
+        GET(
+          `/api/match/${match?.match?.id}/summary?team1=${match?.team1}&team2=${match?.team2}`
+        )
+          .then((res) => {
+            setAnalytics({ summary: res?.data });
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            setAnalytics({ showAnalyticsLoader: false });
+          }),
+      1000
+    );
   };
-
-  if (isEmpty(match)) {
-    return <>Match not found</>;
-  }
-
-  if (loading) {
-    return <>Loading...</>;
-  }
 
   return (
     <Stack
@@ -51,29 +48,46 @@ const Analytics = () => {
         justifyContent: "space-between",
       }}
     >
-      <Stack
-        sx={{ width: "60%", height: "100%", justifyContent: "space-between" }}
-      >
-        <Box sx={{ height: "20%", width: "100%" }}>
-          <MatchInfo />
-        </Box>
-        <Box sx={{ width: "100%", height: "80%" }}>
-          <Charts />
-        </Box>
-      </Stack>
-      <Stack
-        sx={{ width: "40%", height: "100%", justifyContent: "space-between" }}
-      >
-        <Box sx={{ height: "29%", width: "100%" }}>
-          <LocationInfo />
-        </Box>
-        <Box sx={{ height: "29%", width: "100%" }}>
-          <WicketDistributionChart />
-        </Box>
-        <Box sx={{ height: "39%", width: "100%" }}>
-          <BoundariesChart />
-        </Box>
-      </Stack>
+      {" "}
+      {showAnalyticsLoader ? (
+        <Loader />
+      ) : isEmpty(match) ? (
+        <NotFound title="Match not found" />
+      ) : (
+        <Fragment>
+          <Stack
+            sx={{
+              width: "60%",
+              height: "100%",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ height: "20%", width: "100%" }}>
+              <MatchInfo />
+            </Box>
+            <Box sx={{ width: "100%", height: "80%" }}>
+              <Charts />
+            </Box>
+          </Stack>
+          <Stack
+            sx={{
+              width: "40%",
+              height: "100%",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ height: "29%", width: "100%" }}>
+              <LocationInfo />
+            </Box>
+            <Box sx={{ height: "29%", width: "100%" }}>
+              <WicketDistributionChart />
+            </Box>
+            <Box sx={{ height: "39%", width: "100%" }}>
+              <BoundariesChart />
+            </Box>
+          </Stack>
+        </Fragment>
+      )}
     </Stack>
   );
 };

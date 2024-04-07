@@ -5,6 +5,8 @@ interface AnalyticsState {
   summary: any;
   selectedTeam: string;
   chartConfigurations: any;
+  showAppLoader: boolean;
+  showAnalyticsLoader: boolean;
 }
 
 interface AnalyticsContextType extends AnalyticsState {
@@ -29,7 +31,9 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
     chartConfigurations: {
       axesTransitionDuration: 1500,
       barTransitionDuration: 1500,
-    }
+    },
+    showAppLoader: false,
+    showAnalyticsLoader: false,
   });
 
   const setAnalytics = (newAnalytics: Partial<AnalyticsState>) => {

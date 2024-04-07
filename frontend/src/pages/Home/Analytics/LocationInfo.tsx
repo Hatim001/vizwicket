@@ -56,7 +56,7 @@ const LocationInfo = () => {
       .attr("class", "state")
       .attr("d", (d: any) => pathGenerator(d) as string)
       .attr("fill", (d: any) =>
-        matchVenues.includes(d.properties.name) ? "red" : "grey"
+        matchVenues.includes(d.properties.name) ? "#216aac" : "grey"
       );
   }, [match, width, height]);
 
